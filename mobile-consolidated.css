@@ -1,0 +1,855 @@
+/* ================================================================
+   CEMS — CONSOLIDATED MOBILE RESPONSIVE
+   One authoritative file. Replaces ALL mobile overrides that were
+   scattered across styles.css and mobile.css.
+
+   LOAD ORDER: after styles.css, after mobile.css (or replace both
+   mobile sections with this file entirely).
+
+   BREAKPOINTS USED:
+     ≤768px  — tablets + phones (primary mobile target)
+     ≤560px  — small phones (filter bar, field rows)
+     ≤400px  — narrow phones (360px class devices)
+   ================================================================ */
+
+
+/* ════════════════════════════════════════════════════════════════
+   SECTION 0 — GLOBAL (non-breakpoint) FIXES
+   These apply at all widths and plug gaps in styles.css.
+   ════════════════════════════════════════════════════════════════ */
+
+/* 0-A  Word-wrap safety for all text containers.
+        Only scoped to text elements — NOT * — to avoid
+        Safari flex-child collapse (was a bug in old mobile.css). */
+p, h1, h2, h3, h4, h5, h6,
+.event-title, .event-desc, .hero h1,
+.section-title, .panel-title, .modal-title,
+.fb-post-text, .fb-comment-text,
+.dash-greet h2, .logo-text strong {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* 0-B  Body-level overflow lock */
+body {
+  overflow-x: hidden;
+}
+
+/* 0-C  Announcement bar always tracks nav height (all widths) */
+.announcement-bar {
+  top: var(--nav-height);
+}
+
+/* 0-D  Search drop can never exceed viewport */
+.search-results-drop {
+  max-width: calc(100vw - 32px);
+}
+
+/* 0-E  Post text preserves newlines but still wraps */
+.fb-post-text {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+/* 0-F  Tab rows: horizontal scroll on all widths (safe default) */
+.tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+/* 0-G  Panel head wraps gracefully */
+.panel-head {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* 0-H  Admin/org outer tabs: always single row */
+#orgDashTabs,
+#page-admin .tabs {
+  flex-wrap: nowrap;
+}
+
+/* 0-I  Mobile menu z-index above everything */
+.mobile-menu         { z-index: 2100; }
+.mobile-menu-overlay { z-index: 2099; }
+
+/* 0-J  Hide mobile drawer on desktop */
+@media (min-width: 769px) {
+  .mobile-menu-overlay,
+  .mobile-menu { display: none !important; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   SECTION 1 — PRIMARY MOBILE  ≤768px
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* ── 1-A  CSS CUSTOM PROPERTIES ─────────────────────────────
+     SINGLE source of truth for nav heights on mobile.
+     FIX FOR C1: previously declared at 105px, 115px, 130px in
+     three different blocks. 115px matches the real 3-row stacked
+     nav (logo row ≈46px + search row ≈44px + actions row ≈44px
+     + 2×gap 8px ≈ 112px → round up to 115px).
+     If your logo or font renders taller, bump to 120px here only.
+  ─────────────────────────────────────────────────────────────── */
+  body.logged-in {
+    --nav-height:  115px;
+    --ann-height:   38px;
+    --page-offset: calc(var(--nav-height) + var(--ann-height));
+  }
+
+  body:not(.logged-in) {
+    --nav-height:   62px;
+    --ann-height:   38px;
+    --page-offset: calc(var(--nav-height) + var(--ann-height));
+  }
+
+
+  /* ── 1-B  PAGE OFFSET ───────────────────────────────────────
+     FIX FOR C7: styles.css had `calc(...-20px)` which was dead.
+     Now everything derives from --page-offset cleanly.
+  ─────────────────────────────────────────────────────────────── */
+  .page {
+    padding-top: var(--page-offset);
+  }
+
+
+  /* ── 1-C  ANNOUNCEMENT BAR ──────────────────────────────────
+     FIX FOR C3: top tracks --nav-height (already set in 0-C).
+     Height is pinned so --ann-height stays accurate.
+  ─────────────────────────────────────────────────────────────── */
+  .announcement-bar {
+    height:    var(--ann-height);
+    padding:   0 12px;
+    align-items: center;
+    flex-wrap: nowrap;
+    overflow:  hidden;
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .ann-label {
+    font-size:   10px;
+    padding:     2px 6px;
+    flex-shrink: 0;
+  }
+
+  #annText {
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    white-space:   nowrap;
+    flex:          1;
+    min-width:     0;
+  }
+
+  .ann-close { flex-shrink: 0; }
+
+
+  /* ── 1-D  NAV — LOGGED-IN (3-ROW STACKED) ──────────────────
+     FIX FOR C2 + C9: previous code fought between
+     display:grid (FIX4) and display:flex (BLOCK2) in the old
+     file. We use flex-direction:column exclusively.
+     Hamburger stays absolutely positioned in the top-right of
+     the nav box — simplest and most reliable approach.
+  ─────────────────────────────────────────────────────────────── */
+  body.logged-in nav {
+    position:        fixed;        /* reaffirm — already fixed in styles.css */
+    display:         flex;
+    flex-direction:  column;
+    align-items:     stretch;
+    height:          auto;
+    padding:         12px 16px;
+    gap:             8px;
+  }
+
+  /* Row 1: logo (left) + hamburger (top-right, absolutely placed) */
+  
+  .nav-logo {
+    align-self: flex-start;
+  }
+
+  .logo-text small { display: none; }
+
+  .nav-mobile-toggle {
+    display:   flex;
+    position:  absolute;
+    top:       14px;
+    right:     16px;
+    z-index:   10;
+  }
+
+  /* Row 2: full-width search */
+  body.logged-in .nav-search {
+    display:    block !important;
+    max-width:  100%;
+    margin:     0;
+    width:      100%;
+  }
+
+  body.logged-in .nav-search input {
+    width:     100%;
+    font-size: 14px;
+  }
+
+  /* Row 3: action links — single scrollable row, no wrap */
+  body.logged-in .nav-actions {
+    width:                    100%;
+    display:                  flex;
+    align-items:              center;
+    flex-wrap:                nowrap;
+    gap:                      4px;
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width:          none;
+  }
+  body.logged-in .nav-actions::-webkit-scrollbar { display: none; }
+
+  .nav-link {
+    display:     inline-flex !important;
+    padding:     7px 10px;
+    font-size:   13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Hide desktop avatar dropdown — replaced by hamburger menu */
+  .user-menu-wrap { display: none !important; }
+  .role-badge     { display: none !important; }
+  .nav-spacer     { display: none; }
+
+
+  /* ── 1-E  NAV — LOGGED-OUT (SINGLE ROW) ────────────────────
+     Stays compact single row. No hamburger.
+  ─────────────────────────────────────────────────────────────── */
+  nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  height:var(--nav-height);
+  background:#fff;border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow-sm);
+  display:flex;align-items:center;padding:0 32px;gap:24px
+}
+
+  body:not(.logged-in) .nav-logo {
+    flex-shrink:  0;
+    margin-right: auto;
+  }
+
+  body:not(.logged-in) .nav-search  { display: none !important; }
+  body:not(.logged-in) .nav-spacer  { display: none; }
+
+  body:not(.logged-in) .nav-actions {
+    display:        flex;
+    flex-direction: row;
+    align-items:    center;
+    gap:            6px;
+    width:          auto;
+    flex-wrap:      nowrap;
+  }
+
+  body:not(.logged-in) .nav-link { padding: 6px 8px; font-size: 12px; }
+  body:not(.logged-in) .btn      { padding: 7px 11px; font-size: 12px; }
+  body:not(.logged-in) .nav-mobile-toggle { display: none !important; }
+
+
+  /* ── 1-F  HERO ───────────────────────────────────────────────
+     FIX FOR C8: was 40px 16px 80px → 56px bottom saves ~24px.
+     Hero heading clamped tighter for narrow screens.
+  ─────────────────────────────────────────────────────────────── */
+  .hero {
+    padding:  32px 16px 56px;
+    overflow: hidden;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    width:     100%;
+    max-width: 100%;
+  }
+
+  .hero-visual { display: none !important; }
+
+  .hero h1 {
+    font-size:     clamp(28px, 8vw, 44px);
+    letter-spacing: -0.5px;
+    line-height:   1.1;
+    white-space:   normal;
+    word-break:    break-word;
+  }
+
+  .hero p.lead {
+    font-size:     15px;
+    margin-bottom: 24px;
+  }
+
+  .hero-cta {
+    flex-wrap: wrap;
+    gap:       10px;
+  }
+
+  .hero-cta .btn {
+    flex:             1 1 140px;
+    justify-content:  center;
+    max-width:        100%;
+  }
+
+
+  /* ── 1-G  FEATURED STRIP ─────────────────────────────────────
+     FIX FOR C6: kills the negative margin that overlapped hero.
+  ─────────────────────────────────────────────────────────────── */
+  .featured-strip {
+    margin:       16px 16px 0;
+    padding:      16px;
+    max-width:    calc(100vw - 32px);
+    border-radius: 12px;
+    box-sizing:   border-box;
+  }
+
+  .featured-scroll {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+
+  /* ── 1-H  SECTIONS ──────────────────────────────────────────── */
+  .section { padding: 40px 0; }
+
+  .container { padding: 0 16px; }
+
+  .section-title {
+    font-size:     clamp(22px, 6vw, 36px);
+    letter-spacing: -0.3px;
+  }
+
+  .section-sub  { font-size: 14px; }
+  .panel-title  { font-size: 17px; }
+
+
+  /* ── 1-I  EVENTS GRID ───────────────────────────────────────── */
+  .events-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .event-card { max-width: 100%; }
+
+  /* Description: show more text on mobile */
+  .event-desc {
+    display:         block;
+    -webkit-line-clamp: unset;
+    overflow:        visible;
+    white-space:     normal;
+  }
+
+  /* Action buttons: two per row max, wrapping allowed */
+  .event-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .event-actions .btn {
+    flex:             1 1 calc(50% - 3px);
+    justify-content:  center;
+    font-size:        12px;
+    white-space:      nowrap;
+    min-width:        0;
+    overflow:         hidden;
+    text-overflow:    ellipsis;
+  }
+
+
+  /* ── 1-J  DASHBOARD ─────────────────────────────────────────── */
+  .dash-head {
+    padding: 24px 16px 20px;
+  }
+
+  .dash-head-inner {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            12px;
+    width:          100%;
+  }
+
+  .dash-head-inner > .btn,
+  .dash-head-inner > div > .btn {
+    width:           100%;
+    justify-content: center;
+    box-sizing:      border-box;
+  }
+
+  .dash-greet h2 {
+    font-size:  clamp(20px, 5.5vw, 30px);
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .dash-greet p { font-size: 13px; }
+
+  .dash-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .dash-card { padding: 16px 14px; }
+
+  .dash-card-icon {
+    width:         38px;
+    height:        38px;
+    font-size:     18px;
+    margin-bottom: 12px;
+  }
+
+  .dash-card-num {
+    font-size:   clamp(20px, 6vw, 28px);
+    line-height: 1.1;
+  }
+
+  .dash-card-lbl {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+
+
+  /* ── 1-K  TABLES ────────────────────────────────────────────
+     FIX FOR C4: was 580 / 480 / 560 / 620px in four blocks.
+     One value: 560px. Fits 360px screen with horizontal scroll.
+     Scroll containers use shadow-hint for discoverability.
+  ─────────────────────────────────────────────────────────────── */
+
+  /* Any panel-body or known table wrapper gets scroll containment */
+  .panel-body,
+  .panel-body.tight,
+  .modal-body,
+  #myRegsTbl,
+  #orgEventsTbl,
+  #adminTabContent,
+  #vsModalBody {
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Shadow-edge scroll hint (local + scroll background layers) */
+  .panel-body.tight,
+  #myRegsTbl,
+  #orgEventsTbl {
+    background:
+      linear-gradient(to right, #fff 30%, rgba(255,255,255,0)),
+      linear-gradient(to right, rgba(255,255,255,0), #fff 70%) 100% 0,
+      radial-gradient(farthest-side at 0    50%, rgba(10,93,42,.12), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgba(10,93,42,.12), transparent) 100% 0;
+    background-repeat:     no-repeat;
+    background-color:      #fff;
+    background-size:       40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  .tbl {
+    min-width:    560px;
+    width:        max-content;
+    table-layout: auto;
+  }
+
+  .tbl th {
+    white-space:     nowrap;
+    padding:         12px 14px;
+    font-size:       11px;
+    letter-spacing:  0.5px;
+  }
+
+  .tbl td {
+    padding:         12px 14px;
+    font-size:       12.5px;
+    white-space:     normal;
+    word-break:      break-word;
+    overflow-wrap:   break-word;
+    vertical-align:  top;
+  }
+
+  .tbl .status-pill,
+  .tbl .role-badge {
+    white-space: nowrap;
+    display:     inline-block;
+  }
+
+  .tbl-actions {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       4px;
+    min-width: 120px;
+  }
+
+  .tbl-actions .btn {
+    white-space: nowrap;
+    padding:     4px 8px;
+    font-size:   11px;
+  }
+
+  /* First column name truncation */
+  .tbl td strong {
+    display:        block;
+    white-space:    nowrap;
+    overflow:       hidden;
+    text-overflow:  ellipsis;
+    max-width:      160px;
+  }
+
+
+  /* ── 1-L  MODAL ─────────────────────────────────────────────
+     FIX FOR C5: modal-foot direction was column-reverse (styles.css)
+     then overridden to row (FIX9). We keep row — two buttons
+     side-by-side is fine and saves vertical space. Single button
+     goes full-width.
+  ─────────────────────────────────────────────────────────────── */
+  .modal {
+    align-items: flex-end;
+    padding:     0;
+  }
+
+  .modal-card {
+    max-width:                100%;
+    max-height:               92vh;
+    border-radius:            18px 18px 0 0;
+    overflow-y:               auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .modal-head {
+    padding:    16px;
+    position:   sticky;
+    top:        0;
+    z-index:    1;
+    background: var(--csu-green-soft);
+  }
+
+  .modal-body {
+    padding:    16px;
+    overflow-x: auto;
+  }
+
+  .modal-foot {
+    padding:         12px 16px;
+    padding-bottom:  max(12px, env(safe-area-inset-bottom));
+    position:        sticky;
+    bottom:          0;
+    background:      var(--surface2);
+    flex-direction:  row;
+    flex-wrap:       wrap;
+    gap:             8px;
+    justify-content: flex-end;
+  }
+
+  .modal-foot .btn {
+    flex:            1 1 calc(50% - 4px);
+    justify-content: center;
+    min-width:       120px;
+  }
+
+  .modal-foot .btn:only-child {
+    flex: 1 1 100%;
+  }
+
+
+  /* ── 1-M  FILTERS BAR ───────────────────────────────────────── */
+  .filters-bar {
+    flex-wrap:                nowrap;
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width:          none;
+    padding:                  10px 16px;
+    gap:                      8px;
+    border-radius:            8px;
+  }
+
+  .filters-bar::-webkit-scrollbar { display: none; }
+
+  .filter-chip {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .filter-spacer  { display: none; }
+
+
+  /* ── 1-N  FEED LAYOUT ───────────────────────────────────────── */
+  #feedLayout {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  /* Sidebar hidden on mobile — existing rule preserved */
+  #feedSidebar { display: none !important; }
+
+  /* Feed composer */
+  .fb-composer     { padding: 12px; }
+  .fb-composer-btns { gap: 4px; }
+  .fb-composer-btn {
+    font-size: 12px;
+    padding:   7px 8px;
+  }
+
+  /* Post photo thumbnails in composer: horizontal scroll */
+  .post-photo-thumbs {
+    overflow-x:               auto;
+    flex-wrap:                nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom:           4px;
+  }
+
+  .post-photo-thumb { flex-shrink: 0; }
+
+
+  /* ── 1-O  ORG PROFILE / DASHBOARD ──────────────────────────── */
+
+  .org-fb-cover {
+    height:     180px !important;
+    min-height: 180px;
+  }
+
+  /* Reduce avatar overlap on mobile */
+  [style*="margin-top:-48px"] { margin-top: -36px !important; }
+  [style*="margin-top:-32px"] { margin-top: -24px !important; }
+
+  #orgProfileGrid,
+  #orgDashMainGrid {
+    grid-template-columns: 1fr !important;
+    gap: 16px;
+  }
+
+  #orgMyOrgContent .panel-body { padding: 16px; }
+
+
+  /* ── 1-P  TYPOGRAPHY ─────────────────────────────────────────── */
+  .dash-greet h2 {
+    font-size:  clamp(22px, 6vw, 32px);
+    white-space: normal;
+    word-break:  break-word;
+  }
+
+
+  /* ── 1-Q  FOOTER ────────────────────────────────────────────── */
+  footer {
+    padding:    32px 16px 16px;
+    margin-top: 32px;
+  }
+
+  .foot-grid {
+    grid-template-columns: 1fr;
+    gap:         24px;
+    margin-bottom: 24px;
+  }
+
+  .foot-bottom {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            8px;
+    font-size:      11px;
+  }
+
+
+  /* ── 1-R  LIGHTBOX ──────────────────────────────────────────── */
+  .pm-single .pm-cell { aspect-ratio: 4/3; max-height: 320px; }
+  .pm-three .pm-main  { aspect-ratio: 4/5; }
+  .pm-five            { grid-template-rows: 140px 100px; }
+  .pm-more-badge      { font-size: 20px; }
+  .lb-nav             { padding: 8px 16px; font-size: 26px; }
+  #lbImg              { max-height: 70vh; }
+
+
+  /* ── 1-S  MEDIA: ensure images never overflow containers ──── */
+  img, video {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .event-img img,
+  .hc-img img,
+  .featured-card .ph img,
+  .fb-post-media img,
+  .fb-post-media video {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    display:    block;
+  }
+
+} /* end @media ≤768px */
+
+
+/* ════════════════════════════════════════════════════════════════
+   SECTION 2 — MEDIUM-SMALL  ≤860px
+   (feed sidebar collapses before full mobile)
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  #feedLayout {
+    grid-template-columns: 1fr !important;
+  }
+
+  #feedSidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+
+
+/* ════════════════════════════════════════════════════════════════
+   SECTION 3 — SMALL PHONE  ≤560px
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+
+  /* Field rows: always stack */
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  /* Browse page filters: search + sort go full-width below chips */
+  #page-browse .filters-bar {
+    flex-wrap: wrap;
+  }
+
+  #browseSearch {
+    width:  100%;
+    order:  -1;
+  }
+
+  #browseSort {
+    width: 100%;
+  }
+
+} /* end @media ≤560px */
+
+
+/* ════════════════════════════════════════════════════════════════
+   SECTION 4 — VERY SMALL  ≤400px
+   (360px-class devices — Samsung Galaxy A series, etc.)
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+
+  .container { padding: 0 12px; }
+
+  .hero h1 { font-size: clamp(24px, 7.5vw, 32px); }
+
+  .dash-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .dash-card-num { font-size: 20px; }
+  .dash-card-lbl { font-size: 10px; }
+
+  /* Event actions: stack fully on very narrow screens */
+  .event-actions .btn { flex: 1 1 100%; }
+
+  .btn { font-size: 12px; padding: 8px 12px; }
+
+  /* Featured strip: no side margin (it already has border-radius) */
+  .featured-strip {
+    margin-left:   0;
+    margin-right:  0;
+    border-radius: 0;
+  }
+
+.nav-logo img { width: 32px; height: 32px; min-width: 32px; }
+  .tbl th { font-size: 10px; padding: 10px; }
+  .tbl td { font-size: 12px; padding: 10px; }
+  .tbl td strong { max-width: 120px; }
+
+} 
+@media(max-width:768px){
+  body.logged-in .announcement-bar{
+    display:none;
+  }
+}
+/* ============================================================
+   ORG PROFILE — layout fix
+   Replaces the broken flat-stack with a proper sidebar + feed grid.
+   Add this AFTER styles.css / mobile-consolidated.css.
+   ============================================================ */
+
+/* 1. Allow avatar to visually overflow the cover */
+#orgProfileCover {
+  overflow: visible;
+}
+
+/* 2. Keep the cover image itself clipped */
+#orgProfileCover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+/* 3. Content wrapper: pull up to overlap cover */
+#orgProfileContent {
+  position: relative;
+  margin-top: -32px;
+  z-index: 1;
+  padding: 0 32px 48px;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 4. Two-column grid: sidebar (about+photos) | posts feed */
+.org-profile-body-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
+  gap: 20px;
+  align-items: start;
+  margin-top: 20px;
+}
+
+/* Sidebar stacks its panels vertically */
+.org-profile-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Posts column */
+.org-profile-feed {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Mobile: single column ──────────────────────────────── */
+@media (max-width: 768px) {
+  #orgProfileContent {
+    padding: 0 12px 32px;
+    margin-top: -20px;
+  }
+
+  .org-profile-body-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  /* On mobile: sidebar (about+photos) appear ABOVE posts */
+  .org-profile-sidebar { order: 1; }
+  .org-profile-feed    { order: 2; }
+
+  #orgProfileCover {
+    height: 160px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #orgProfileContent {
+    padding: 0 10px 24px;
+    margin-top: -16px;
+  }
+
+  #orgProfileCover {
+    height: 120px !important;
+  }
+}

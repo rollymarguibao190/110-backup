@@ -1,0 +1,133 @@
+/* ============================================================
+   CEMS MOBILE FIX v3
+   Paste this at the very bottom of mobile-consolidated.css
+   REMOVES the previous mobile-fix.css first, then add this one
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  /* === NAV === */
+  body:not(.logged-in) nav {
+    height: 62px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0 16px !important;
+    gap: 12px !important;
+  }
+
+  body:not(.logged-in) {
+    --nav-height: 62px !important;
+    --ann-height: 40px !important;
+    --page-offset: 102px !important;
+  }
+
+  .page {
+    padding-top: 102px !important;
+  }
+
+  /* === ANNOUNCEMENT BAR === */
+  .announcement-bar {
+    top: 62px !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* === HERO === */
+  .hero {
+    padding: 28px 20px 36px !important;
+  }
+
+  .hero::after {
+    height: 28px !important;
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+    gap: 0 !important;
+  }
+
+  /* Hide floating cards on mobile */
+  .hero-visual {
+    display: none !important;
+  }
+
+  /* Hero tag */
+  .hero-tag {
+    font-size: 10px !important;
+    padding: 5px 12px !important;
+    margin-bottom: 14px !important;
+  }
+
+  /* Hero heading — same weight, just smaller */
+  .hero h1 {
+    font-size: 32px !important;
+    line-height: 1.08 !important;
+    margin-bottom: 14px !important;
+    letter-spacing: -0.5px !important;
+  }
+
+  /* Lead text */
+  .hero p.lead {
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin-bottom: 24px !important;
+  }
+
+  /* Buttons — side by side, original shape */
+  .hero-cta {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 10px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .hero-cta .btn {
+    flex: 1 1 0 !important;
+    padding: 11px 8px !important;
+    font-size: 13px !important;
+    border-radius: 10px !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+  }
+
+  /* === FEATURED STRIP === */
+  .featured-strip {
+    margin: 0 12px !important;
+    border-radius: 14px !important;
+  }
+
+  /* === SECTIONS === */
+  .section {
+    padding: 40px 0 !important;
+  }
+
+  .events-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* === FOOTER === */
+  .foot-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+/* Stack buttons only on very narrow screens */
+@media (max-width: 360px) {
+  .hero h1 {
+    font-size: 27px !important;
+  }
+
+  .hero-cta {
+    flex-direction: column !important;
+  }
+
+  .hero-cta .btn {
+    width: 100% !important;
+    flex: unset !important;
+  }
+}

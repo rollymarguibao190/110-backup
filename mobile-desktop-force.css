@@ -1,0 +1,724 @@
+
+body,
+body.logged-in,
+body:not(.logged-in) {
+  --nav-height:  64px;   /* slightly tighter than 72px desktop — still fits logo+buttons */
+  --ann-height:  36px;
+  --page-offset: calc(var(--nav-height) + var(--ann-height));
+}
+
+
+/* ================================================================
+   SECTION 2 — PAGE OFFSET
+   ================================================================ */
+
+/* FIX: always use desktop offset — undo §1-B */
+.page {
+  padding-top: var(--page-offset) !important;
+}
+
+
+/* ================================================================
+   SECTION 3 — ANNOUNCEMENT BAR
+   ================================================================ */
+
+/* FIX: un-hide announcement bar on mobile (§ last block hid it for logged-in) */
+@media (max-width: 768px) {
+  body.logged-in .announcement-bar {
+    display: flex !important;
+  }
+
+  /* FIX: compact bar — no gap, tight text */
+  .announcement-bar {
+    height:      var(--ann-height) !important;
+    padding:     0 16px !important;
+    font-size:   12px !important;
+    gap:         8px !important;
+    white-space: nowrap !important;
+    overflow:    hidden !important;
+  }
+
+  .ann-label {
+    font-size:   10px !important;
+    padding:     2px 7px !important;
+    flex-shrink: 0 !important;
+  }
+
+  #annText {
+    overflow:      hidden !important;
+    text-overflow: ellipsis !important;
+    white-space:   nowrap !important;
+    flex:          1 !important;
+    min-width:     0 !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 4 — NAVBAR: keep single-row horizontal desktop layout
+   ================================================================ */
+
+
+
+/* ================================================================
+   SECTION 5 — HERO: desktop two-column layout, scaled for mobile
+   Goal: left text col + right floating cards, side by side.
+   Strategy: shrink everything proportionally. Right column is
+   position:relative with overflow:visible so cards can overlap
+   each other just like desktop — but clipped by hero overflow:hidden.
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* ── Hero wrapper: clip overflowing cards, enough height for content ── */
+  .hero {
+    padding:    20px 0 0 !important;
+    overflow:   hidden !important;
+    min-height: 0 !important;
+  }
+
+  /* ── Two-column grid, same proportion as desktop (1.2fr 1fr) ── */
+  .hero-inner {
+    display:               grid !important;
+    grid-template-columns: 1.15fr 1fr !important;
+    gap:                   0 !important;
+    align-items:           center !important;
+    max-width:             100% !important;
+    padding:               20px 0 32px 18px !important; /* left pad for text, no right pad */
+    min-height:            340px !important;
+  }
+
+  /* ════ LEFT COLUMN: text content ════ */
+
+  /* Badge */
+  .hero-tag {
+    font-size:     8.5px !important;
+    padding:       4px 9px !important;
+    margin-bottom: 10px !important;
+    letter-spacing: .3px !important;
+    gap:            5px !important;
+  }
+
+  /* Heading — scaled from ~68px desktop to fit ~54% of 390px = ~210px */
+  .hero h1 {
+    font-size:      22px !important;
+    line-height:    1.05 !important;
+    letter-spacing: -0.3px !important;
+    margin-bottom:  8px !important;
+    white-space:    normal !important;
+    max-width:      100% !important;
+  }
+
+  /* Lead text */
+  .hero p.lead {
+    font-size:     11px !important;
+    line-height:   1.55 !important;
+    margin-bottom: 14px !important;
+    max-width:     100% !important;
+    color:         rgba(255,255,255,.85) !important;
+  }
+
+  /* CTA buttons: side by side, scaled down */
+  .hero-cta {
+    display:       flex !important;
+    flex-wrap:     wrap !important;
+    gap:           7px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .hero-cta .btn {
+    flex:       0 0 auto !important;
+    padding:    9px 13px !important;
+    font-size:  11.5px !important;
+    min-height: 36px !important;
+    border-radius: 8px !important;
+  }
+
+  /* ════ RIGHT COLUMN: floating cards ════ */
+
+  /* Container: relative so absolute children are anchored to it.
+     Tall enough to show all 3 overlapping cards. */
+  .hero-visual {
+    position:   relative !important;
+    display:    block !important;       /* back to normal block, not flex */
+    height:     300px !important;
+    overflow:   visible !important;
+    flex-shrink: 0 !important;
+    /* no margin/padding overrides — desktop styles handle absolute coords */
+  }
+
+  /* ── Card base: scale desktop 280px cards down to ~160px ──
+     Desktop scale factor: 160/280 = ~0.57
+     Positions also scaled proportionally from desktop values. */
+  .hero-card {
+    width:        155px !important;
+    height:       130px !important;
+    padding:      10px !important;      /* white border like desktop */
+    border-radius: 12px !important;
+    background:   #fff !important;
+    box-shadow:   0 8px 28px rgba(0,0,0,.35) !important;
+    overflow:     hidden !important;
+    animation:    none !important;      /* stop float animation on mobile */
+  }
+
+  /* Card images */
+  .hero-card img {
+    width:        100% !important;
+    height:       100% !important;
+    object-fit:   cover !important;
+    border-radius: 6px !important;
+    display:      block !important;
+  }
+
+  /* ── Card positions: mimic desktop overlapping layout ──
+     Desktop: hc-1 top:20px right:20px  →  mobile: top:0 right:0
+     Desktop: hc-2 top:170px left:0      →  mobile: top:90px left:-10px
+     Desktop: hc-3 top:320px right:40px  →  mobile: top:170px right:10px  */
+  .hero-card.hc-1 {
+    position:  absolute !important;
+    top:       0 !important;
+    right:     0 !important;
+    left:      auto !important;
+    transform: rotate(3deg) !important;
+    z-index:   3 !important;
+  }
+
+  .hero-card.hc-2 {
+    position:  absolute !important;
+    top:       88px !important;
+    left:      -12px !important;
+    right:     auto !important;
+    transform: rotate(-4deg) !important;
+    z-index:   2 !important;
+  }
+
+  .hero-card.hc-3 {
+    position:  absolute !important;
+    top:       165px !important;
+    right:     8px !important;
+    left:      auto !important;
+    transform: rotate(2deg) !important;
+    z-index:   1 !important;
+  }
+}
+
+/* ── Extra small phones ≤400px: tighten further ── */
+@media (max-width: 400px) {
+  .hero-inner {
+    padding: 16px 0 28px 14px !important;
+    min-height: 300px !important;
+  }
+
+  .hero h1      { font-size: 19px !important; }
+  .hero p.lead  { font-size: 10px !important; }
+  .hero-cta .btn { padding: 7px 11px !important; font-size: 10.5px !important; }
+
+  .hero-card         { width: 130px !important; height: 108px !important; padding: 8px !important; }
+  .hero-card.hc-2    { top: 74px !important; left: -8px !important; }
+  .hero-card.hc-3    { top: 138px !important; }
+  .hero-visual       { height: 256px !important; }
+}
+
+
+/* ================================================================
+   SECTION 6 — FEATURED STRIP: sits below two-column hero
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* No negative margin pull — hero bottom is now flush */
+  .featured-strip {
+    margin:        16px 12px 0 !important;
+    padding:       16px !important;
+    max-width:     calc(100% - 24px) !important;
+    border-radius: 14px !important;
+    box-sizing:    border-box !important;
+  }
+
+  .featured-head h3 { font-size: 18px !important; }
+
+  /* Horizontal scroll row of cards */
+  .featured-scroll {
+    display:                  flex !important;
+    flex-direction:           row !important;
+    gap:                      12px !important;
+    overflow-x:               auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width:          none !important;
+    padding-bottom:           4px !important;
+  }
+
+  .featured-scroll::-webkit-scrollbar { display: none; }
+
+  .featured-card {
+    flex-shrink: 0 !important;
+    width:       220px !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 7 — EVENTS GRID: keep multi-column desktop grid
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: §1-I collapsed to 1 column; restore desktop auto-fill */
+  .events-grid {
+    display:               grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)) !important;
+    gap:                   24px !important;
+  }
+
+  /* FIX: restore truncated description (desktop shows 2 lines) */
+  .event-desc {
+    display:            -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow:           hidden !important;
+    white-space:        normal !important;
+  }
+
+  /* FIX: restore event action buttons side-by-side */
+  .event-actions {
+    flex-wrap: nowrap !important;
+    gap:       8px !important;
+  }
+
+  .event-actions .btn {
+    flex:      1 !important;
+    font-size: 14px !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 8 — DASHBOARD STATS: keep 4-column grid
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: §1-J collapsed to 2-col; restore 4-col desktop */
+  .dash-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap:                   18px !important;
+    overflow-x:            auto !important;   /* FIX: scroll if viewport too narrow */
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .dash-card {
+    padding:  22px !important;
+    min-width: 140px !important;              /* FIX: prevent card crush */
+  }
+
+  .dash-card-num {
+    font-size:   32px !important;
+    line-height: 1 !important;
+  }
+
+  .dash-card-lbl {
+    font-size:  13px !important;
+    margin-top: 5px !important;
+  }
+
+  .dash-card-icon {
+    width:         46px !important;
+    height:        46px !important;
+    font-size:     22px !important;
+    margin-bottom: 14px !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 9 — DASHBOARD HEADER: restore side-by-side layout
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: §1-J stacked header content; restore desktop flex row */
+  .dash-head {
+    padding: 40px 32px !important;
+  }
+
+  .dash-head-inner {
+    flex-direction: row !important;
+    align-items:    center !important;
+    gap:            24px !important;
+    flex-wrap:      wrap !important;
+  }
+
+  .dash-head-inner > .btn,
+  .dash-head-inner > div > .btn {
+    width:           auto !important;       /* FIX: undo 100% width override */
+    justify-content: flex-start !important;
+  }
+
+  .dash-greet h2 {
+    font-size:   32px !important;
+    white-space: normal !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 10 — TABLES: horizontal scroll, keep desktop layout
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: tables scroll horizontally — keep desktop column widths */
+  .panel-body.tight,
+  #myRegsTbl,
+  #orgEventsTbl,
+  #adminTabContent {
+    overflow-x:               auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    /* FIX: remove the scroll-shadow hack (background shorthand) — it 
+       fights with panel background on some browsers */
+    background: #fff !important;
+  }
+
+  .tbl {
+    min-width:    700px !important;          /* FIX: wider than mobile-consolidated's 560px — more breathing room */
+    table-layout: auto !important;
+  }
+
+  .tbl th {
+    white-space:    nowrap !important;
+    padding:        14px 20px !important;   /* FIX: restore desktop padding */
+    font-size:      12px !important;
+  }
+
+  .tbl td {
+    padding:         16px 20px !important;  /* FIX: restore desktop padding */
+    font-size:       14px !important;
+    white-space:     normal !important;
+    vertical-align:  middle !important;
+  }
+
+  .tbl-actions .btn {
+    padding:   6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .tbl td strong {
+    max-width:     none !important;         /* FIX: undo truncation */
+    white-space:   normal !important;
+    overflow:      visible !important;
+    text-overflow: clip !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 11 — PANELS & TABS: restore desktop layout
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: panel head stacked in §1; restore desktop side-by-side */
+  .panel-head {
+    flex-direction: row !important;
+    align-items:    center !important;
+    flex-wrap:      wrap !important;
+  }
+
+  /* FIX: tabs keep desktop sizing */
+  .tab {
+    padding:    11px 20px !important;
+    font-size:  14px !important;
+    flex-shrink: 0 !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 12 — FEED LAYOUT & SIDEBAR: keep two-column desktop
+   ================================================================ */
+
+
+
+/* ================================================================
+   SECTION 13 — ORG PROFILE: keep two-column desktop grid
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: §1-O collapsed org profile; restore two-column */
+  .org-profile-body-grid {
+    display:               grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr) !important;
+    gap:                   20px !important;
+  }
+
+  /* FIX: restore sidebar / feed order */
+  .org-profile-sidebar { order: 0 !important; }
+  .org-profile-feed    { order: 0 !important; }
+
+  /* FIX: restore cover height */
+  #orgProfileCover,
+  .org-fb-cover {
+    height:     280px !important;
+    min-height: 280px !important;
+  }
+
+  /* FIX: restore avatar overlap */
+  [style*="margin-top:-48px"] { margin-top: -48px !important; }
+  [style*="margin-top:-32px"] { margin-top: -32px !important; }
+
+  /* FIX: restore organizer dash two-column */
+  #orgProfileGrid,
+  #orgDashMainGrid,
+  .org-profile-grid,
+  .org-dash-main-grid {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 14 — MODAL: keep centered desktop modal (not bottom sheet)
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: §1-L turned modals into bottom sheets; restore desktop center */
+  .modal {
+    align-items:     center !important;
+    justify-content: center !important;
+    padding:         24px !important;
+  }
+
+  .modal-card {
+    max-width:     560px !important;
+    max-height:    90vh !important;
+    border-radius: 18px !important;
+  }
+
+  .modal-card.lg {
+    max-width: 780px !important;
+  }
+
+  /* FIX: restore desktop modal footer direction */
+  .modal-foot {
+    flex-direction:  row !important;
+    flex-wrap:       wrap !important;
+    justify-content: flex-end !important;
+    padding:         18px 28px !important;
+  }
+
+  .modal-foot .btn {
+    flex:            initial !important;
+    width:           auto !important;
+    min-width:       0 !important;
+    justify-content: center !important;
+  }
+
+  /* FIX: restore modal head */
+  .modal-head {
+    padding:  24px 28px !important;
+    position: static !important;
+  }
+
+  .modal-body {
+    padding: 28px !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 15 — FORM FIELD ROWS: keep two-column desktop layout
+   ================================================================ */
+
+@media (max-width: 560px) {
+
+  /* FIX: §3 stacked all field rows; restore desktop 2-col */
+  .field-row {
+    grid-template-columns: 1fr 1fr !important;
+    gap:                   14px !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 16 — FOOTER: restore desktop 4-column grid
+   ================================================================ */
+
+@media (max-width: 768px) {
+
+  /* FIX: §1-Q collapsed footer to 1-col; restore 4-col */
+  .foot-grid {
+    display:               grid !important;
+    grid-template-columns: 2fr 1fr 1fr 1fr !important;
+    gap:                   48px !important;
+    overflow-x:            auto !important;  /* FIX: scroll if needed */
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .foot-bottom {
+    flex-direction: row !important;
+    align-items:    center !important;
+    font-size:      12px !important;
+  }
+
+  footer {
+    padding:    60px 32px 24px !important;
+    margin-top: 60px !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 17 — CONTAINER: add horizontal scroll as escape valve
+   This is the key safety net — if any child overflows, the page
+   scrolls horizontally rather than clipping content.
+   ================================================================ */
+
+/* FIX: top-level page containers get horizontal scroll */
+.page {
+  overflow-x: auto !important;
+}
+
+/* FIX: inner containers stay at desktop max-width, don't shrink */
+.container {
+  min-width:  0 !important;
+  max-width:  1280px !important;
+  padding:    0 32px !important;           /* desktop padding */
+}
+
+@media (max-width: 768px) {
+  /* FIX: pages can scroll horizontally — viewport is the clipping context */
+  html {
+    overflow-x: auto !important;          /* allow page-level horizontal scroll */
+  }
+
+  body {
+    overflow-x: auto !important;
+    min-width:  0 !important;
+  }
+}
+
+
+/* ================================================================
+   SECTION 18 — TOUCH TARGET SAFETY
+   Keep all interactive elements at minimum 44×44px regardless of
+   the layout forcing above — accessibility is non-negotiable.
+   ================================================================ */
+
+/* FIX: maintain touch-friendly tap targets everywhere */
+.btn,
+.nav-link,
+.tab,
+.filter-chip,
+.tbl-actions .btn,
+.mobile-menu-item,
+.fb-action-btn,
+.fb-composer-btn {
+  min-height: 44px !important;
+}
+
+/* FIX: inline chips in browse filter can be shorter — they're secondary */
+.browse-chips .filter-chip {
+  min-height: 36px !important;  /* acceptable for secondary filter chips */
+}
+
+
+/* ================================================================
+   SECTION 19 — BROWSE PAGE: keep filter panel desktop layout
+   ================================================================ */
+
+@media (max-width: 640px) {
+
+  /* FIX: §browse overrides stacked sort; restore inline */
+  .browse-sort-row {
+    flex-direction: row !important;
+    align-items:    center !important;
+    gap:            12px !important;
+    flex-wrap:      wrap !important;
+  }
+
+  .browse-sort-select {
+    width:     auto !important;
+    max-width: 280px !important;
+  }
+
+  /* FIX: chips stay horizontal, scrollable */
+  .browse-chips {
+    flex-wrap:                nowrap !important;
+    overflow-x:               auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom:           4px !important;
+    scrollbar-width:          none !important;
+  }
+
+  .browse-chips::-webkit-scrollbar { display: none; }
+}
+
+
+/* ================================================================
+   SECTION 20 — VERY SMALL SCREEN SAFETY  ≤400px
+   At extremely narrow viewports the page will scroll horizontally.
+   These rules prevent any element from making the page taller
+   unnecessarily or trapping overflow.
+   ================================================================ */
+
+@media (max-width: 400px) {
+
+  /* FIX: undo the 2-col dash-grid collapse at 400px */
+  .dash-grid {
+    grid-template-columns: repeat(4, 1fr) !important; /* keep desktop, scroll */
+  }
+
+  /* FIX: undo the 100% btn collapse for event-actions at 400px */
+  .event-actions .btn {
+    flex: 1 !important;
+  }
+
+  /* FIX: undo featured-strip border-radius:0 at 400px */
+  .featured-strip {
+    border-radius: 12px !important;
+  }
+}
+@media (max-width: 768px) {
+  body.logged-in {
+    --nav-height: 160px;  /* increase this until hero clears the nav */
+  }
+
+  body.logged-in .page {
+    padding-top: var(--page-offset) !important;
+  }
+}
+/* ================================================================
+   MOBILE DASHBOARD CARDS FIX — 2 column grid on mobile
+   ================================================================ */
+@media (max-width: 768px) {
+  .dash-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap:                   12px !important;
+    overflow-x:            visible !important;
+    min-width:             0 !important;
+  }
+
+  .dash-card {
+    min-width:  0 !important;
+    padding:    16px 14px !important;
+  }
+
+  .dash-card-num {
+    font-size:   24px !important;
+    line-height: 1.1 !important;
+  }
+
+  .dash-card-lbl {
+    font-size:  12px !important;
+    margin-top: 4px !important;
+  }
+
+  .dash-card-icon {
+    width:         38px !important;
+    height:        38px !important;
+    font-size:     18px !important;
+    margin-bottom: 10px !important;
+  }
+}

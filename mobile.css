@@ -1,0 +1,881 @@
+/* ================================================================
+   CEMS — MOBILE.CSS  (single authoritative file)
+   Replaces: mobile-consolidated.css + desktop-override.css
+ 
+   DECISION: Desktop-first. This file contains ONLY overrides
+   that diverge from the desktop baseline in styles.css.
+   No !important. No duplicate declarations. No counter-overrides.
+ 
+   LOAD ORDER: after styles.css only.
+ 
+   BREAKPOINTS:
+     ≤860px  — feed sidebar collapses
+     ≤768px  — primary mobile (tablets + phones)
+     ≤640px  — browse page adjustments
+     ≤560px  — small phones (field rows)
+     ≤400px  — narrow phones (360px class)
+   ================================================================ */
+ 
+ 
+/* ════════════════════════════════════════════════════════════════
+   SECTION 0 — GLOBAL (all widths)
+   ════════════════════════════════════════════════════════════════ */
+ 
+/* Word-wrap safety — scoped to text elements only (avoids Safari
+   flex-child collapse that * { overflow-wrap } triggers) */
+p, h1, h2, h3, h4, h5, h6,
+.event-title, .event-desc, .hero h1,
+.section-title, .panel-title, .modal-title,
+.fb-post-text, .fb-comment-text,
+.dash-greet h2, .logo-text strong {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+ 
+body {
+  overflow-x: hidden;
+}
+ 
+/* Announcement bar always tracks nav height */
+.announcement-bar {
+  top: var(--nav-height);
+}
+ 
+/* Search drop never exceeds viewport */
+.search-results-drop {
+  max-width: calc(100vw - 32px);
+}
+ 
+/* Post text preserves newlines but wraps */
+.fb-post-text {
+  hyphens: auto;
+}
+ 
+/* Tabs: horizontal scroll everywhere (safe default) */
+.tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+.tabs::-webkit-scrollbar { display: none; }
+ 
+/* Panel head wraps gracefully */
+.panel-head {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+ 
+/* Admin/org outer tabs: always single row */
+#orgDashTabs,
+#page-admin .tabs {
+  flex-wrap: nowrap;
+}
+ 
+/* Mobile menu z-index above everything */
+.mobile-menu         { z-index: 2100; }
+.mobile-menu-overlay { z-index: 2099; }
+ 
+/* Hide mobile drawer on desktop */
+@media (min-width: 769px) {
+  .mobile-menu-overlay,
+  .mobile-menu { display: none; }
+}
+ 
+/* Images never overflow containers */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+ 
+ 
+/* ════════════════════════════════════════════════════════════════
+   SECTION 1 — FEED SIDEBAR COLLAPSES  ≤860px
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 860px) {
+  #feedLayout {
+    grid-template-columns: 1fr;
+  }
+ 
+  /* Sidebar goes from vertical stack to horizontal card grid */
+  #feedSidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+}
+ 
+ 
+/* ════════════════════════════════════════════════════════════════
+   SECTION 2 — PRIMARY MOBILE  ≤768px
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+ 
+  /* ── 2-A  CSS CUSTOM PROPERTIES ─────────────────────────────
+     Single source of truth for nav heights on mobile.
+     logged-in: 3-row stacked nav
+       logo row ~46px + search row ~44px + actions row ~44px
+       + 2×gap 8px + 12px top padding = ~162px → but measured
+       renders at ~115px. Adjust here if your logo is taller.
+     logged-out: single compact row.
+     --ann-height shared — same value for both body states.
+  ─────────────────────────────────────────────────────────────── */
+  :root {
+    --ann-height: 38px;
+  }
+ 
+  body.logged-in {
+    --nav-height:  115px;
+    --page-offset: calc(var(--nav-height) + var(--ann-height));
+  }
+ 
+  body:not(.logged-in) {
+    --nav-height:   62px;
+    --page-offset: calc(var(--nav-height) + var(--ann-height));
+  }
+ 
+ 
+  /* ── 2-B  PAGE OFFSET ──────────────────────────────────────── */
+  .page {
+    padding-top: var(--page-offset);
+  }
+ 
+ 
+  /* ── 2-C  ANNOUNCEMENT BAR ─────────────────────────────────── */
+  .announcement-bar {
+    height:      var(--ann-height);
+    padding:     0 12px;
+    align-items: center;
+    flex-wrap:   nowrap;
+    overflow:    hidden;
+    font-size:   12px;
+    gap:         8px;
+  }
+ 
+  .ann-label {
+    font-size:   10px;
+    padding:     2px 6px;
+    flex-shrink: 0;
+  }
+ 
+  #annText {
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    white-space:   nowrap;
+    flex:          1;
+    min-width:     0;
+  }
+ 
+  .ann-close { flex-shrink: 0; }
+ 
+ 
+  /* ── 2-D  NAV — LOGGED-IN (3-ROW STACKED) ──────────────────── */
+  body.logged-in nav {
+    display:        flex;
+    flex-direction: column;
+    align-items:    stretch;
+    height:         auto;
+    padding:        12px 16px;
+    gap:            8px;
+  }
+ 
+  .nav-logo {
+    align-self: flex-start;
+  }
+ 
+  .logo-text small { display: none; }
+ 
+  /* Hamburger: absolutely positioned top-right of the nav box */
+  .nav-mobile-toggle {
+    display:  flex;
+    position: absolute;
+    top:      14px;
+    right:    16px;
+    z-index:  10;
+  }
+ 
+  /* Full-width search in row 2 */
+  body.logged-in .nav-search {
+    display:   block;
+    max-width: 100%;
+    margin:    0;
+    width:     100%;
+  }
+ 
+  body.logged-in .nav-search input {
+    width:     100%;
+    font-size: 14px;
+  }
+ 
+  /* Action links — single scrollable row */
+  body.logged-in .nav-actions {
+    width:                    100%;
+    display:                  flex;
+    align-items:              center;
+    flex-wrap:                nowrap;
+    gap:                      4px;
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width:          none;
+  }
+  body.logged-in .nav-actions::-webkit-scrollbar { display: none; }
+ 
+  .nav-link {
+    display:     inline-flex;
+    padding:     7px 10px;
+    font-size:   13px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+ 
+  /* Avatar dropdown and role badge replaced by hamburger */
+  .user-menu-wrap { display: none; }
+  .role-badge     { display: none; }
+  .nav-spacer     { display: none; }
+ 
+ 
+  /* ── 2-E  NAV — LOGGED-OUT (SINGLE COMPACT ROW) ────────────── */
+  body:not(.logged-in) nav {
+    flex-direction: row;
+    align-items:    center;
+    flex-wrap:      nowrap;
+    height:         var(--nav-height);
+    padding:        0 16px;
+    gap:            6px;
+  }
+ 
+  body:not(.logged-in) .nav-logo {
+    flex-shrink:  0;
+    margin-right: auto;
+  }
+ 
+  body:not(.logged-in) .logo-text small { display: inline; }
+ 
+  body:not(.logged-in) .nav-search  { display: none; }
+  body:not(.logged-in) .nav-spacer  { display: none; }
+ 
+  body:not(.logged-in) .nav-actions {
+    display:    flex;
+    flex-wrap:  nowrap;
+    width:      auto;
+    gap:        6px;
+  }
+ 
+  body:not(.logged-in) .nav-link      { padding: 6px 8px;    font-size: 12px; }
+  body:not(.logged-in) .btn           { padding: 7px 11px;   font-size: 12px; }
+  body:not(.logged-in) .nav-mobile-toggle { display: none; }
+ 
+ 
+  /* ── 2-F  HERO — MOBILE TWO-COLUMN (scaled-down desktop) ───── */
+  .hero {
+    padding:    20px 0 0;
+    overflow:   hidden;
+  }
+ 
+  .hero-inner {
+    display:               grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap:                   0;
+    align-items:           center;
+    max-width:             100%;
+    padding:               20px 0 32px 18px;
+    min-height:            340px;
+  }
+ 
+  .hero-tag {
+    font-size:      8.5px;
+    padding:        4px 9px;
+    margin-bottom:  10px;
+    letter-spacing: .3px;
+    gap:            5px;
+  }
+ 
+  .hero h1 {
+    font-size:      22px;
+    line-height:    1.05;
+    letter-spacing: -0.3px;
+    margin-bottom:  8px;
+    white-space:    normal;
+  }
+ 
+  .hero p.lead {
+    font-size:     11px;
+    line-height:   1.55;
+    margin-bottom: 14px;
+  }
+ 
+  .hero-cta {
+    display:       flex;
+    flex-wrap:     wrap;
+    gap:           7px;
+    margin-bottom: 0;
+  }
+ 
+  .hero-cta .btn {
+    flex:          0 0 auto;
+    padding:       9px 13px;
+    font-size:     11.5px;
+    min-height:    36px;
+    border-radius: 8px;
+  }
+ 
+  /* Right column: floating hero cards, scaled from 280px to ~155px */
+  .hero-visual {
+    position:    relative;
+    display:     block;
+    height:      300px;
+    overflow:    visible;
+    flex-shrink: 0;
+  }
+ 
+  .hero-card {
+    width:         155px;
+    height:        130px;
+    padding:       10px;
+    border-radius: 12px;
+    background:    #fff;
+    box-shadow:    0 8px 28px rgba(0,0,0,.35);
+    overflow:      hidden;
+    animation:     none; /* stop float animation on mobile */
+  }
+ 
+  .hero-card img {
+    width:         100%;
+    height:        100%;
+    object-fit:    cover;
+    border-radius: 6px;
+    display:       block;
+  }
+ 
+  /* Mimic desktop overlapping layout at mobile scale */
+  .hero-card.hc-1 {
+    position:  absolute;
+    top:       0;
+    right:     0;
+    left:      auto;
+    transform: rotate(3deg);
+    z-index:   3;
+  }
+ 
+  .hero-card.hc-2 {
+    position:  absolute;
+    top:       88px;
+    left:      -12px;
+    right:     auto;
+    transform: rotate(-4deg);
+    z-index:   2;
+  }
+ 
+  .hero-card.hc-3 {
+    position:  absolute;
+    top:       165px;
+    right:     8px;
+    left:      auto;
+    transform: rotate(2deg);
+    z-index:   1;
+  }
+ 
+ 
+  /* ── 2-G  FEATURED STRIP ────────────────────────────────────── */
+  .featured-strip {
+    margin:        16px 12px 0;
+    padding:       16px;
+    max-width:     calc(100% - 24px);
+    border-radius: 14px;
+    box-sizing:    border-box;
+  }
+ 
+  .featured-head h3 { font-size: 18px; }
+ 
+  /* Horizontal scroll row */
+  .featured-scroll {
+    display:                  flex;
+    flex-direction:           row;
+    gap:                      12px;
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width:          none;
+    padding-bottom:           4px;
+  }
+ 
+  .featured-scroll::-webkit-scrollbar { display: none; }
+ 
+  .featured-card {
+    flex-shrink: 0;
+    width:       220px;
+  }
+ 
+ 
+  /* ── 2-H  SECTIONS & CONTAINER ─────────────────────────────── */
+  .section    { padding: 40px 0; }
+  .container  { padding: 0 16px; }
+ 
+  .section-title { font-size: clamp(22px, 6vw, 36px); letter-spacing: -0.3px; }
+  .section-sub   { font-size: 14px; }
+  .panel-title   { font-size: 17px; }
+ 
+ 
+  /* ── 2-I  EVENTS GRID ───────────────────────────────────────── */
+  .events-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+ 
+  .event-card { max-width: 100%; }
+ 
+  /* Show full description on mobile */
+  .event-desc {
+    display:    block;
+    overflow:   visible;
+    white-space: normal;
+    -webkit-line-clamp: unset;
+  }
+ 
+  /* Two buttons per row max */
+  .event-actions {
+    flex-wrap: wrap;
+    gap:       6px;
+  }
+ 
+  .event-actions .btn {
+    flex:           1 1 calc(50% - 3px);
+    justify-content: center;
+    font-size:      12px;
+    white-space:    nowrap;
+    min-width:      0;
+    overflow:       hidden;
+    text-overflow:  ellipsis;
+  }
+ 
+ 
+  /* ── 2-J  DASHBOARD HEADER ──────────────────────────────────── */
+  .dash-head {
+    padding: 24px 16px 20px;
+  }
+ 
+  .dash-head-inner {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            12px;
+    width:          100%;
+  }
+ 
+  .dash-head-inner > .btn,
+  .dash-head-inner > div > .btn {
+    width:           100%;
+    justify-content: center;
+    box-sizing:      border-box;
+  }
+ 
+  .dash-greet h2 {
+    font-size:  clamp(20px, 5.5vw, 30px);
+    white-space: normal;
+    word-break: break-word;
+  }
+ 
+  .dash-greet p { font-size: 13px; }
+ 
+ 
+  /* ── 2-K  DASHBOARD STAT CARDS ─────────────────────────────── */
+  .dash-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+ 
+  .dash-card { padding: 16px 14px; }
+ 
+  .dash-card-icon {
+    width:         38px;
+    height:        38px;
+    font-size:     18px;
+    margin-bottom: 12px;
+  }
+ 
+  .dash-card-num {
+    font-size:   clamp(20px, 6vw, 28px);
+    line-height: 1.1;
+  }
+ 
+  .dash-card-lbl {
+    font-size:  11px;
+    margin-top: 4px;
+  }
+ 
+ 
+  /* ── 2-L  TABLES ─────────────────────────────────────────────
+     Horizontal scroll with shadow hint for discoverability.
+     min-width 560px fits 360px screen with room to scroll.
+  ─────────────────────────────────────────────────────────────── */
+  .panel-body,
+  .panel-body.tight,
+  .modal-body,
+  #myRegsTbl,
+  #orgEventsTbl,
+  #adminTabContent,
+  #vsModalBody {
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+  }
+ 
+  .panel-body.tight,
+  #myRegsTbl,
+  #orgEventsTbl {
+    background:
+      linear-gradient(to right, #fff 30%, rgba(255,255,255,0)),
+      linear-gradient(to right, rgba(255,255,255,0), #fff 70%) 100% 0,
+      radial-gradient(farthest-side at 0    50%, rgba(10,93,42,.12), transparent),
+      radial-gradient(farthest-side at 100% 50%, rgba(10,93,42,.12), transparent) 100% 0;
+    background-repeat:     no-repeat;
+    background-color:      #fff;
+    background-size:       40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+ 
+  .tbl {
+    min-width:    560px;
+    width:        max-content;
+    table-layout: auto;
+  }
+ 
+  .tbl th {
+    white-space:    nowrap;
+    padding:        12px 14px;
+    font-size:      11px;
+    letter-spacing: 0.5px;
+  }
+ 
+  .tbl td {
+    padding:       12px 14px;
+    font-size:     12.5px;
+    white-space:   normal;
+    word-break:    break-word;
+    overflow-wrap: break-word;
+    vertical-align: top;
+  }
+ 
+  .tbl .status-pill,
+  .tbl .role-badge {
+    white-space: nowrap;
+    display:     inline-block;
+  }
+ 
+  .tbl-actions {
+    display:   flex;
+    flex-wrap: wrap;
+    gap:       4px;
+    min-width: 120px;
+  }
+ 
+  .tbl-actions .btn {
+    white-space: nowrap;
+    padding:     4px 8px;
+    font-size:   11px;
+  }
+ 
+  .tbl td strong {
+    display:       block;
+    white-space:   nowrap;
+    overflow:      hidden;
+    text-overflow: ellipsis;
+    max-width:     160px;
+  }
+ 
+ 
+  /* ── 2-M  MODAL — BOTTOM SHEET ──────────────────────────────── */
+  .modal {
+    align-items: flex-end;
+    padding:     0;
+  }
+ 
+  .modal-card {
+    max-width:                100%;
+    max-height:               92vh;
+    border-radius:            18px 18px 0 0;
+    overflow-y:               auto;
+    -webkit-overflow-scrolling: touch;
+  }
+ 
+  .modal-head {
+    padding:    16px;
+    position:   sticky;
+    top:        0;
+    z-index:    1;
+    background: var(--csu-green-soft);
+  }
+ 
+  .modal-body {
+    padding:    16px;
+    overflow-x: auto;
+  }
+ 
+  .modal-foot {
+    padding:         12px 16px;
+    padding-bottom:  max(12px, env(safe-area-inset-bottom));
+    position:        sticky;
+    bottom:          0;
+    background:      var(--surface2);
+    flex-direction:  row;
+    flex-wrap:       wrap;
+    gap:             8px;
+    justify-content: flex-end;
+  }
+ 
+  .modal-foot .btn {
+    flex:            1 1 calc(50% - 4px);
+    justify-content: center;
+    min-width:       120px;
+  }
+ 
+  .modal-foot .btn:only-child {
+    flex: 1 1 100%;
+  }
+ 
+ 
+  /* ── 2-N  FILTERS BAR ───────────────────────────────────────── */
+  .filters-bar {
+    flex-wrap:                nowrap;
+    overflow-x:               auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width:          none;
+    padding:                  10px 16px;
+    gap:                      8px;
+    border-radius:            8px;
+  }
+ 
+  .filters-bar::-webkit-scrollbar { display: none; }
+ 
+  .filter-chip  { flex-shrink: 0; white-space: nowrap; }
+  .filter-spacer { display: none; }
+ 
+ 
+  /* ── 2-O  FEED ──────────────────────────────────────────────── */
+  #feedLayout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+ 
+  #feedSidebar { display: none; }
+ 
+  .fb-composer        { padding: 12px; }
+  .fb-composer-btns   { gap: 4px; }
+  .fb-composer-btn    { font-size: 12px; padding: 7px 8px; }
+ 
+  .post-photo-thumbs {
+    overflow-x:               auto;
+    flex-wrap:                nowrap;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom:           4px;
+  }
+ 
+  .post-photo-thumb { flex-shrink: 0; }
+ 
+ 
+  /* ── 2-P  ORG PROFILE ───────────────────────────────────────── */
+  .org-fb-cover {
+    height:     180px;
+    min-height: 180px;
+  }
+ 
+  [style*="margin-top:-48px"] { margin-top: -36px; }
+  [style*="margin-top:-32px"] { margin-top: -24px; }
+ 
+  #orgProfileGrid,
+  #orgDashMainGrid,
+  .org-profile-grid,
+  .org-dash-main-grid,
+  .org-profile-body-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+ 
+  .org-profile-sidebar { order: 1; }
+  .org-profile-feed    { order: 2; }
+ 
+  #orgProfileContent {
+    padding:    0 12px 32px;
+    margin-top: -20px;
+  }
+ 
+  #orgProfileCover,
+  #orgProfileCover img {
+    height: 160px;
+  }
+ 
+  #orgMyOrgContent .panel-body { padding: 16px; }
+ 
+ 
+  /* ── 2-Q  FOOTER ─────────────────────────────────────────────── */
+  footer {
+    padding:    32px 16px 16px;
+    margin-top: 32px;
+  }
+ 
+  .foot-grid {
+    grid-template-columns: 1fr;
+    gap:          24px;
+    margin-bottom: 24px;
+  }
+ 
+  .foot-bottom {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            8px;
+    font-size:      11px;
+  }
+ 
+ 
+  /* ── 2-R  LIGHTBOX ──────────────────────────────────────────── */
+  .pm-single .pm-cell { aspect-ratio: 4/3; max-height: 320px; }
+  .pm-three .pm-main  { aspect-ratio: 4/5; }
+  .pm-five            { grid-template-rows: 140px 100px; }
+  .pm-more-badge      { font-size: 20px; }
+  .lb-nav             { padding: 8px 16px; font-size: 26px; }
+  #lbImg              { max-height: 70vh; }
+ 
+ 
+  /* ── 2-S  MEDIA IN CARDS ────────────────────────────────────── */
+  .event-img img,
+  .hc-img img,
+  .featured-card .ph img,
+  .fb-post-media img,
+  .fb-post-media video {
+    width:      100%;
+    height:     100%;
+    object-fit: cover;
+    display:    block;
+  }
+ 
+ 
+  /* ── 2-T  TOUCH TARGETS ─────────────────────────────────────── */
+  .btn,
+  .nav-link,
+  .tab,
+  .filter-chip,
+  .tbl-actions .btn,
+  .mobile-menu-item,
+  .fb-action-btn,
+  .fb-composer-btn {
+    min-height: 44px;
+  }
+ 
+  /* Secondary filter chips can be shorter */
+  .browse-chips .filter-chip { min-height: 36px; }
+ 
+} /* end @media ≤768px */
+ 
+ 
+/* ════════════════════════════════════════════════════════════════
+   SECTION 3 — BROWSE PAGE  ≤640px
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+ 
+  .browse-filter-panel {
+    padding:       16px;
+    gap:           14px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+ 
+  .browse-sort-row {
+    flex-direction: column;
+    align-items:    flex-start;
+    gap:            8px;
+  }
+ 
+  .browse-sort-select { width: 100%; max-width: 100%; }
+ 
+  .browse-chips .filter-chip { font-size: 12px; padding: 5px 12px; }
+ 
+  .ecr-section-tabs { overflow-x: auto; }
+  .ecr-section-tab  { padding: 10px 16px; font-size: 13px; }
+ 
+  /* Stack event list card vertically */
+  .ecr-card { flex-direction: column; align-items: stretch; }
+ 
+  .ecr-image-wrap { width: 100%; height: 160px; }
+ 
+  .ecr-body  { padding: 12px 14px; }
+ 
+  .ecr-title { font-size: 15px; white-space: normal; }
+ 
+  .ecr-action { padding: 0 14px 14px; justify-content: flex-end; }
+ 
+  .ecr-section-head-past { margin-top: 28px; }
+  .ecr-section-title     { font-size: 17px; }
+ 
+} /* end @media ≤640px */
+ 
+ 
+/* ════════════════════════════════════════════════════════════════
+   SECTION 4 — SMALL PHONE  ≤560px
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 560px) {
+ 
+  /* Field rows stack on small phones */
+  .field-row { grid-template-columns: 1fr; }
+ 
+  /* Browse: search + sort go full-width */
+  #page-browse .filters-bar { flex-wrap: wrap; }
+ 
+  #browseSearch { width: 100%; order: -1; }
+  #browseSort   { width: 100%; }
+ 
+} /* end @media ≤560px */
+ 
+ 
+/* ════════════════════════════════════════════════════════════════
+   SECTION 5 — NARROW PHONES  ≤400px
+   (360px-class: Samsung Galaxy A series, etc.)
+   ════════════════════════════════════════════════════════════════ */
+@media (max-width: 400px) {
+ 
+  .container { padding: 0 12px; }
+ 
+  /* Hero tightens further */
+  .hero-inner {
+    padding:    16px 0 28px 14px;
+    min-height: 300px;
+  }
+ 
+  .hero h1      { font-size: 19px; }
+  .hero p.lead  { font-size: 10px; }
+ 
+  .hero-cta .btn { padding: 7px 11px; font-size: 10.5px; }
+ 
+  .hero-card         { width: 130px; height: 108px; padding: 8px; }
+  .hero-card.hc-2    { top: 74px;   left: -8px; }
+  .hero-card.hc-3    { top: 138px; }
+  .hero-visual       { height: 256px; }
+ 
+  /* Stat cards: still 2-col (scrollable if needed) */
+  .dash-grid { gap: 8px; }
+ 
+  .dash-card-num { font-size: 20px; }
+  .dash-card-lbl { font-size: 10px; }
+ 
+  /* Event actions: full-width stack */
+  .event-actions .btn { flex: 1 1 100%; }
+ 
+  .btn { font-size: 12px; padding: 8px 12px; }
+ 
+  /* Featured strip: no side margin at narrowest */
+  .featured-strip {
+    margin-left:   0;
+    margin-right:  0;
+    border-radius: 8px;
+  }
+ 
+  .nav-logo img { width: 32px; height: 32px; min-width: 32px; }
+ 
+  .tbl th { font-size: 10px; padding: 10px; }
+  .tbl td { font-size: 12px; padding: 10px; }
+  .tbl td strong { max-width: 120px; }
+ 
+  /* Browse event cards: shorter image on very narrow screens */
+  .ecr-image-wrap { height: 140px; }
+ 
+  /* Browse filter panel */
+  .browse-filter-panel { padding: 14px 12px; }
+  .browse-chips .filter-chip { font-size: 11.5px; padding: 5px 10px; }
+ 
+} /* end @media ≤400px */
